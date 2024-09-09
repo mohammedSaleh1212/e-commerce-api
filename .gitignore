@@ -1,0 +1,6 @@
+node_modules
+apires.json
+.env
+/models/sale.ts
+/routes/sales.ts
+/controller/saleController.ts
