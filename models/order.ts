@@ -36,7 +36,7 @@ interface IOrder extends Document {
 
 }
 
-const orderSchema = new mongoose.Schema({
+const orderSchema: Schema = new mongoose.Schema({
     user: {
         type: new mongoose.Schema({
             name: {
@@ -55,20 +55,22 @@ const orderSchema = new mongoose.Schema({
     },
 
     items: [{
-        _id: {
-            type: Schema.Types.ObjectId,
-            ref: 'Product'
+        type: new mongoose.Schema({
+            _id: {
+                type: Schema.Types.ObjectId,
+                ref: 'Product'
 
-        },
+            },
 
-        title: {
-            type: String,
-            trim: true,
-            minlenght: 5,
-            maxlength: 255
-        },
-        quantity: Number,
-        price: Number,
+            title: {
+                type: String,
+                trim: true,
+                minlenght: 5,
+                maxlength: 255
+            },
+            quantity: Number,
+            price: Number,
+        })
     }],
     createdAt: {
         type: Date,

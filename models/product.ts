@@ -58,15 +58,16 @@ const Product = mongoose.model<IProduct>('Product', productSchema) //this gets m
 
 function validateProduct(product: ProductDTO) {
     const schema = Joi.object({
-        title: Joi.string().min(2).max(30).required(),
+        title: Joi.string().trim().min(2).max(30).required(),
         description: Joi.string().min(5).max(50).required(),
         categoryId: Joi.string().min(24).required(),
         numberInStock: Joi.number().min(0).required(),
-        // image: Joi.object({
-        //     data: Joi.binary().required(),
-        //     contentType: Joi.string().valid('image/jpeg', 'image/png', 'image/gif').required()
-        // }).required()
-
+        image: Joi.object({
+            filename: Joi.string().required(),
+            contentType: Joi.string().required(),
+            imageBase64: Joi.string().required(),
+        }).required(),
+ 
 
     })
 

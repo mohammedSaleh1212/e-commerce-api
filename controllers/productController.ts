@@ -1,3 +1,4 @@
+import { ProductDTO } from "../dtos/productDTO"
 import { Category } from "../models/category"
 import { Product, validateProduct } from "../models/product"
 import { Request, Response } from 'express'
@@ -10,16 +11,21 @@ const getAllProducts = async (req: Request, res: Response) => {
     }
     return res.send(products)
 }
-const postProduct = async (req: Request, res: Response) => {
-console.log(req.file)
-    // const { error } = validateProduct(req.body)
-    // if (error) return res.status(400).send(error.details[0].message)
+const postProduct = async (req: Request, res: Response) => { 
+    console.log(req.file)
     if(!req.file) {
         return res.status(404).send('product has to have an image')
     }
+    const { originalname, mimetype, buffer } = req.file
+    req.body.image = {
+        filename: originalname,
+        contentType: mimetype,
+        imageBase64: buffer.toString('base64')
+    }
     
     const {categoryId,description,title,numberInStock} = req.body
-    const { originalname, mimetype, buffer } = req.file
+    const { error } = validateProduct(req.body)
+    if (error) return res.status(400).send(error.details[0].message)
 
         const category = await Category.findById(categoryId)
     if (!category) return res.status(400).send('no such category')
@@ -39,7 +45,6 @@ console.log(req.file)
 
     })
    await product.save()
-    // res.send(product)
     res.status(201).json({ message: 'Product created successfully', product });
 }
 const updateProduct = async (req: Request, res: Response) => {
@@ -48,6 +53,11 @@ const updateProduct = async (req: Request, res: Response) => {
 
     const category = await Category.findById(req.body.categoryId);
     if (!category) return res.status(400).send('No such category');
+    if(!req.file) {
+        return res.status(400).send('product should have an image ')
+    }
+    const { originalname, mimetype, buffer } = req.file
+
 
     const product = await Product.findByIdAndUpdate(
         req.params.id,
@@ -59,10 +69,11 @@ const updateProduct = async (req: Request, res: Response) => {
                 name: category.name
             },
             numberInStock:req.body.numberInStock,
-            // image: {
-            //     data: req.file?.buffer,
-            //     contentType: req.file?.mimetype
-            //   }
+            image: {
+                filename: originalname,
+                contentType: mimetype,
+                imageBase64: buffer.toString('base64'),
+              },
 
         },
         { new: true, runValidators: true }

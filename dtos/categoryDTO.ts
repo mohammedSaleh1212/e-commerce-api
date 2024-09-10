@@ -1,4 +1,4 @@
-interface categoryDTO {
+interface CategoryDTO {
     name:string
 }
-export default categoryDTO
+export default CategoryDTO

@@ -1,4 +1,4 @@
-import CreateCategoryDto from '../dtos/categoryDTO'
+import CategoryDTO from '../dtos/categoryDTO'
 import Joi from 'joi'
 import mongoose from 'mongoose'
 export interface ICategory extends mongoose.Document {
@@ -20,7 +20,7 @@ export const categorySchema:mongoose.Schema = new mongoose.Schema({
 const Category = mongoose.model<ICategory>('Category', categorySchema) //this gets me a Genre class 
 
 
-function validateCategory(category:CreateCategoryDto) {
+function validateCategory(category:CategoryDTO) {
     const schema = Joi.object({
         name:Joi.string().min(2).max(30).required()
     })
