@@ -1,5 +1,6 @@
 import { Category, validateCategory } from "../models/category"
 import { Request, Response } from 'express'
+import categoryDTO from "../dtos/categoryDTO"
 
 
 const getAllCategories = async (req: Request, res: Response) => {
@@ -12,12 +13,13 @@ const getAllCategories = async (req: Request, res: Response) => {
 const postCategory = async (req: Request, res: Response) => {
     const { error } = validateCategory(req.body)
     if (error) return res.status(400).send(error.details[0].message)
-    let category = new Category(req.body)
+    const { name }: categoryDTO = req.body
+    let category = new Category({ name })
     category = await category.save()
 
     res.send(category)
 }
-const updateCategory = async (req: Request, res: Response) => { 
+const updateCategory = async (req: Request, res: Response) => {
     const { error } = validateCategory(req.body)
     if (error) return res.status(400).send(error.details[0].message)
     const category = await Category.findByIdAndUpdate(req.params.id, { name: req.body.name }, { new: true })
@@ -34,7 +36,7 @@ const deleteCategory = async (req: Request, res: Response) => {
     }
     return res.send(category);
 }
-const getSingleCategory = async(req: Request, res: Response) => {
+const getSingleCategory = async (req: Request, res: Response) => {
     const category = await Category.findById(req.params.id)
     if (!category) {
         return res.status(404).send('no category with the given id')
@@ -42,4 +44,4 @@ const getSingleCategory = async(req: Request, res: Response) => {
     return res.send(category);
 }
 
-export { getAllCategories, postCategory ,updateCategory,deleteCategory,getSingleCategory }
+export { getAllCategories, postCategory, updateCategory, deleteCategory, getSingleCategory }

@@ -11,23 +11,36 @@ const getAllProducts = async (req: Request, res: Response) => {
     return res.send(products)
 }
 const postProduct = async (req: Request, res: Response) => {
-    const { error } = validateProduct(req.body)
-    if (error) return res.status(400).send(error.details[0].message)
-    const category = await Category.findById(req.body.categoryId)
+console.log(req.file)
+    // const { error } = validateProduct(req.body)
+    // if (error) return res.status(400).send(error.details[0].message)
+    if(!req.file) {
+        return res.status(404).send('product has to have an image')
+    }
+    
+    const {categoryId,description,title,numberInStock} = req.body
+    const { originalname, mimetype, buffer } = req.file
+
+        const category = await Category.findById(categoryId)
     if (!category) return res.status(400).send('no such category')
     const product = new Product({
-        title: req.body.title,
-        description: req.body.description,
+        title: title,
+        description: description,
         category: {
             _id: category._id,
             name: category.name
         },
-        numberInStock:req.body.numberInStock
-
+        numberInStock:numberInStock,
+        image: {
+            filename: originalname,
+            contentType: mimetype,
+            imageBase64: buffer.toString('base64'),
+          },
 
     })
    await product.save()
-    res.send(product)
+    // res.send(product)
+    res.status(201).json({ message: 'Product created successfully', product });
 }
 const updateProduct = async (req: Request, res: Response) => {
     const { error } = validateProduct(req.body);
@@ -45,7 +58,11 @@ const updateProduct = async (req: Request, res: Response) => {
                 _id: category._id,
                 name: category.name
             },
-            numberInStock:req.body.numberInStock
+            numberInStock:req.body.numberInStock,
+            // image: {
+            //     data: req.file?.buffer,
+            //     contentType: req.file?.mimetype
+            //   }
 
         },
         { new: true, runValidators: true }

@@ -1,15 +1,29 @@
-// import Joi from 'joi'
-// Joi.object = require('joi-objectid')(Joi)
+
 
 const Joi = require('@hapi/joi')
 Joi.objectId = require('joi-objectid')(Joi)
 
-import mongoose from 'mongoose'
-import { CreateReviewDto } from '../dtos/create-review'
+import mongoose, { Document } from 'mongoose'
+import { reviewDTO } from '../dtos/reviewDTO'
+interface IReview extends Document {
+    _id: mongoose.Schema.Types.ObjectId
+    text: string
+    dateOut: Date
+    user:{
+        _id:mongoose.Schema.Types.ObjectId
+        name:string
+        email:string
+    }
+    product:{
+        _id:mongoose.Schema.Types.ObjectId
+        title:string
+    }
+
+}
 
 const reviewSchema = new mongoose.Schema({
     user: {
-        type: new mongoose.Schema({
+
             name: {
                 type: String,
                 required: true,
@@ -20,12 +34,11 @@ const reviewSchema = new mongoose.Schema({
                 type: String,
                 required: true,
             },
-   
-        }),
-        required: true
+
+        // required: true causes error
     },
     product: {
-        type: new mongoose.Schema({
+   
             title: {
                 type: String,
                 required: true,
@@ -33,8 +46,8 @@ const reviewSchema = new mongoose.Schema({
                 minlenght: 5,
                 maxlength: 255
             },
-        }),
-        required: true 
+  
+        // required: true cases error
     },
     dateOut: {
         type: Date,
@@ -42,23 +55,23 @@ const reviewSchema = new mongoose.Schema({
         trim: true,
         default: Date.now
     },
-    text:{
-        type:String,
-        required:true
+    text: {
+        type: String,
+        required: true
     }
 })
 
 
-const Review = mongoose.model('Review', reviewSchema) //this gets me a Genre class 
+const Review = mongoose.model<IReview>('Review', reviewSchema) //this gets me a Genre class 
 
 
-function validateReview(review: CreateReviewDto) {
+function validateReview(review: reviewDTO) {
     const schema = Joi.object({
         // userId:Joi.string().required().min(24),
-        userId:Joi.objectId().required(),
+        userId: Joi.objectId().required(),
         // productId: Joi.string().min(24).required(),
         productId: Joi.objectId().required(),
-        text:Joi.string().required()
+        text: Joi.string().required()
 
 
     })

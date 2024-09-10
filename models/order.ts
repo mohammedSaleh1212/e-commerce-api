@@ -1,12 +1,40 @@
-// import Joi from 'joi'
-// Joi.object = require('joi-objectid')(Joi)
+
 
 const Joi = require('@hapi/joi')
 Joi.objectId = require('joi-objectid')(Joi)
 
-import mongoose from 'mongoose'
-import { CreateSale } from '../dtos/create-sale'
-import { CreateOrder } from '../dtos/createOrder'
+import mongoose, { Schema } from 'mongoose'
+import { OrderDTO } from '../dtos/OrderDTO'
+import { Document } from 'mongoose'
+interface Item {
+    _id: mongoose.Schema.Types.ObjectId,
+    title: string,
+    quantity: number,
+    price: number
+}
+interface IOrder extends Document {
+    _id: mongoose.Schema.Types.ObjectId,
+    createdAt: Date,
+    totalAmount: number,
+    dateReturned?: Date,
+    deliveryFee: number,
+    orderStatus: string,
+
+    shippingDetails: {
+        address: String,
+        city: String,
+        zip: String
+    },
+    user: {
+        _id: mongoose.Schema.Types.ObjectId,
+        name: string,
+        email: string
+    },
+    items: Item[]
+
+
+
+}
 
 const orderSchema = new mongoose.Schema({
     user: {
@@ -26,19 +54,21 @@ const orderSchema = new mongoose.Schema({
         required: true
     },
 
-    items:[ {
-        type: new mongoose.Schema({
-            title: {
-                type: String,
-                required: true,
-                trim: true,
-                minlenght: 5,
-                maxlength: 255
-            },
-            quantity:Number,
-            price:Number,
-        }),
-        // required: true
+    items: [{
+        _id: {
+            type: Schema.Types.ObjectId,
+            ref: 'Product'
+
+        },
+
+        title: {
+            type: String,
+            trim: true,
+            minlenght: 5,
+            maxlength: 255
+        },
+        quantity: Number,
+        price: Number,
     }],
     createdAt: {
         type: Date,
@@ -50,7 +80,7 @@ const orderSchema = new mongoose.Schema({
         type: Number,
         required: true
     },
-    
+
     dateReturned: {//in case in the future we want to add that the customer cna return something
         type: Date,
 
@@ -63,24 +93,24 @@ const orderSchema = new mongoose.Schema({
     },
     orderStatus: {
         type: String,
-        enum: ['pending','confiremd', 'completed','delivered'],
+        enum: ['pending', 'confiremd', 'completed', 'delivered'],
         default: 'pending',
         required: true
     },
     shippingDetails: {
-        address:String,
+        address: String,
         city: String,
         zip: String
-      }
+    }
 
 
 })
 
 
-const Order = mongoose.model('Order', orderSchema) //this gets me a Genre class 
+const Order = mongoose.model<IOrder>('Order', orderSchema) //this gets me a Genre class 
 
 
-function validateOrder(sale: CreateOrder) {
+function validateOrder(sale: OrderDTO) {
     const schema = Joi.object({
         // userId:Joi.string().required().min(24),
         userId: Joi.objectId().required(),

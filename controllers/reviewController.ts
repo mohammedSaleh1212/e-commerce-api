@@ -1,5 +1,4 @@
 import { User } from "../models/user"
-import { Sale, validateSale } from "../models/sale"
 import { Request, Response } from 'express'
 import { Product } from "../models/product"
 import { Review, validateReview } from "../models/review"
@@ -50,7 +49,7 @@ const postReview = async (req: Request, res: Response) => {
     
 
 const updateReview = async (req: Request, res: Response) => {
-    const { error } = validateSale(req.body);
+    const { error } = validateReview(req.body);
     if (error) return res.status(400).send(error.details[0].message);
 
     const user = await User.findById(req.body.userId)

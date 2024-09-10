@@ -1,13 +1,27 @@
-import createProductDto from '../dtos/createProduct'
+import { ProductDTO } from '../dtos/productDTO' 
 import Joi from 'joi'
-import mongoose from 'mongoose'
-import { categorySchema } from './category'
+import mongoose, { Schema } from 'mongoose'
+interface IProduct extends Document {
+    _id: mongoose.Schema.Types.ObjectId 
+    title: string
+    description: string
+    numberInStock:number
+    category: {
+        _id: mongoose.Schema.Types.ObjectId; 
+        name: string; 
+    }
+    image: {
+        filename: string;
+        contentType: string;
+        imageBase64: string;
+      }
+}
 
 const productSchema = new mongoose.Schema({
     title: {
         type: String,
         required: true,
-        trim:true,
+        trim: true,
         minLength: 2,
         maxLength: 30
     },
@@ -17,38 +31,48 @@ const productSchema = new mongoose.Schema({
         minLength: 2,
         maxLength: 30
     },
-    category:{
-        type:categorySchema,
-        required:true
+    category: {
+        _id: { type: Schema.Types.ObjectId, ref: 'Category', required: true },
+        name: { type: String, required: true },
     },
     numberInStock: {
-        type:Number,
-        required:true,
-        default:0,
+        type: Number,
+        required: true,
+        default: 0,
 
-    }
+    },
+    image: {
+        filename: { type: String, required: true },
+        contentType: { type: String, required: true },
+        imageBase64: { type: String, required: true },
+    },
+
 
 
 
 })
 
 
- const Product = mongoose.model('Product', productSchema) //this gets me a Genre class 
+const Product = mongoose.model<IProduct>('Product', productSchema) //this gets me a Genre class 
 
 
-function validateProduct(product:createProductDto) {
+function validateProduct(product: ProductDTO) {
     const schema = Joi.object({
-        title:Joi.string().min(2).max(30).required(),
-        description:Joi.string().min(5).max(50).required(),
-        categoryId:Joi.string().min(24).required(),
-        numberInStock:Joi.number().min(0).required()
+        title: Joi.string().min(2).max(30).required(),
+        description: Joi.string().min(5).max(50).required(),
+        categoryId: Joi.string().min(24).required(),
+        numberInStock: Joi.number().min(0).required(),
+        // image: Joi.object({
+        //     data: Joi.binary().required(),
+        //     contentType: Joi.string().valid('image/jpeg', 'image/png', 'image/gif').required()
+        // }).required()
 
-        
+
     })
 
     return schema.validate(product)
 
 }
-export {Product,validateProduct}
+export { Product, validateProduct }
 
 
