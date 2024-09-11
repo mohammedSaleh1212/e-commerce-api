@@ -13,7 +13,7 @@ interface IProduct extends Document {
     image: {
         filename: string;
         contentType: string;
-        imageBase64: string;
+        path: string;
       }
 }
 
@@ -44,7 +44,7 @@ const productSchema = new mongoose.Schema({
     image: {
         filename: { type: String, required: true },
         contentType: { type: String, required: true },
-        imageBase64: { type: String, required: true },
+        path: { type: String, required: true },
     },
 
 
@@ -62,12 +62,12 @@ function validateProduct(product: ProductDTO) {
         description: Joi.string().min(5).max(50).required(),
         categoryId: Joi.string().min(24).required(),
         numberInStock: Joi.number().min(0).required(),
+    
         image: Joi.object({
             filename: Joi.string().required(),
-            contentType: Joi.string().required(),
-            imageBase64: Joi.string().required(),
+            contentType: Joi.string().valid('image/jpeg', 'image/png').required(),
+            path: Joi.string().required(), // Updated to validate the path instead of imageBase64
         }).required(),
- 
 
     })
 

@@ -8,6 +8,6 @@ export interface ProductDTO {
     image: {
         filename: string;
         contentType: string;
-        imageBase64: string;
+        path: string;
       }
   }
